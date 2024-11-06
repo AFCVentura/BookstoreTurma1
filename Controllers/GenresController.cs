@@ -18,5 +18,21 @@ namespace Bookstore.Controllers
         {
             return View(_service.FindAll());
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create()
+        {
+
+        }
+
+
+
+
     }
 }
