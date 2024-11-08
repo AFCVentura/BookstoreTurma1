@@ -7,12 +7,13 @@ namespace Bookstore.Models
         public int Id { get; set; }
 
         [Display(Name = "Nome")]
+        [Required(ErrorMessage = "O campo {0} é obrigatório")]
         public string Name { get; set; }
         //public ICollection<Book> Books { get; set; } = new List<Book>();
 
         public Genre()
         {
-            
+
         }
 
         public Genre(int id, string name)
@@ -25,4 +26,3 @@ namespace Bookstore.Models
 
     }
 }
-    
