@@ -1,7 +1,11 @@
 ﻿using Bookstore.Data;
 using Bookstore.Models;
+using Bookstore.Models.ViewModels;
 using Bookstore.Services;
+using Bookstore.Services.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+
 
 namespace Bookstore.Controllers
 {
@@ -14,9 +18,9 @@ namespace Bookstore.Controllers
 			_service = service;
 		}
 
-		public IActionResult Index()
+		public async Task<IActionResult> Index()
 		{
-			return View(_service.FindAll());
+			return View(await _service.FindAllAsync());
 		}
 
 		public IActionResult Create()
@@ -26,18 +30,62 @@ namespace Bookstore.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(Genre genre)
+		public async Task<IActionResult> Create(Genre genre)
 		{
 			if (!ModelState.IsValid)
 			{
 				return View();
 			}
 
-			_service.Insert(genre);
+			await _service.InsertAsync(genre);
 
 			return RedirectToAction(nameof(Index));
 		}
 
+
+		public async Task<IActionResult> Delete(int? id)
+		{
+			if (id is null)
+			{
+				return RedirectToAction(nameof(Error), 
+					new { message = "O id não foi fornecido." });
+			}
+			Genre genre = await _service.FindByIdAsync(id.Value);
+			if (genre is null)
+			{
+                return RedirectToAction(nameof(Error),
+                    new { message = "O id não foi encontrado." });
+            }
+
+			return View(genre);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Delete(int id)
+		{
+			try
+			{
+				await _service.RemoveAsync(id);
+				return RedirectToAction(nameof(Index));
+			}
+			catch (IntegrityException ex)
+			{
+				return RedirectToAction(nameof(Error), new { message = ex.Message });
+			}
+		}
+
+
+		public IActionResult Error(string message)
+		{
+			ErrorViewModel viewModel = new ErrorViewModel
+			{
+				Message = message,
+				RequestId = Activity.Current?.Id
+					?? HttpContext.TraceIdentifier
+			};
+			return View(viewModel);
+		}
 
 
 
