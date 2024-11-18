@@ -2,6 +2,7 @@
 using Bookstore.Models;
 using Bookstore.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Bookstore.Services
 {
@@ -43,5 +44,29 @@ namespace Bookstore.Services
 				throw new IntegrityException(ex.Message);
 			}
 		}
-	}
+
+        // POST: Genres/Edit/x
+        public async Task UpdateAsync(Genre genre)
+        {
+            // Confere se tem alguém com esse Id
+            bool hasAny = await _context.Genres.AnyAsync(x => x.Id == genre.Id);
+            // Se não tiver, lança exceção de NotFound.
+            if (!hasAny)
+            {
+                throw new NotFoundException("Id não encontrado");
+            }
+            // Tenta atualizar
+            try
+            {
+                _context.Update(genre);
+                await _context.SaveChangesAsync();
+            }
+            // Se não der, captura a exceção lançada
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new DbConcurrencyException(ex.Message);
+            }
+        }
+
+    }
 }
