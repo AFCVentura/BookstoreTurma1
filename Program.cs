@@ -30,6 +30,7 @@ namespace Bookstore
 			});
 
             builder.Services.AddScoped<GenreService>();
+            builder.Services.AddScoped<GenreService>();
             builder.Services.AddScoped<SeedingService>();
 
 
