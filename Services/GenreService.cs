@@ -25,6 +25,10 @@ namespace Bookstore.Services
 			_context.Add(genre);
 			await _context.SaveChangesAsync();
 		}
+		public async Task<Genre> FindByIdEagerAsync(int id)
+		{
+			return await _context.Genres.Include(x => x.Books).FirstOrDefaultAsync(x => x.Id == id);
+		}
 
 		public async Task<Genre> FindByIdAsync(int id)
 		{
